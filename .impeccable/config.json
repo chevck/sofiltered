@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "montserrat",
+        "createdAt": "2026-09-22T13:06:30.717Z",
+        "reason": "user asked for pixel-exact replication of an existing reference site (readdy.cc preview) that uses Montserrat paired with Playfair Display; matching the source font is the explicit brief, not an accidental default"
+      }
+    ]
+  }
+}
