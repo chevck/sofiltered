@@ -15,7 +15,8 @@
 
   /* Mosaic rows drift in opposite directions on scroll */
   const mosaicRows = document.querySelectorAll(".mosaic-row");
-  if (mosaicRows.length) {
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (mosaicRows.length && !prefersReducedMotion) {
     let mosaicTicking = false;
     const updateMosaic = () => {
       const y = window.scrollY;
@@ -112,39 +113,106 @@
     revealEls.forEach((el) => el.classList.add("is-visible"));
   }
 
-  /* Testimonial carousel (dots only — grid already shows 3 at a time on desktop) */
-  const dots = document.querySelectorAll(".testi-dots span");
-  const testiGrid = document.querySelector(".testi-grid");
-  let testiIndex = 0;
-  function setTesti(i) {
-    testiIndex = i;
-    dots.forEach((d, idx) => d.classList.toggle("is-active", idx === i));
-  }
-  document.querySelectorAll(".testi-arrow").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const dir = btn.classList.contains("testi-arrow--next") ? 1 : -1;
-      const next = (testiIndex + dir + dots.length) % dots.length;
-      setTesti(next);
-      if (testiGrid) {
-        testiGrid.style.transition = "opacity 0.3s ease";
-        testiGrid.style.opacity = "0.3";
-        setTimeout(() => (testiGrid.style.opacity = "1"), 200);
-      }
-    });
-  });
-  dots.forEach((d, idx) => d.addEventListener("click", () => setTesti(idx)));
+  /* Testimonial carousel — real sliding track, N cards visible responsively */
+  const testiViewport = document.querySelector(".testi-viewport");
+  const testiTrack = document.querySelector(".testi-grid");
+  const testiCards = document.querySelectorAll(".testi-card");
+  const testiDotsWrap = document.querySelector(".testi-dots");
 
-  /* Portfolio filter */
+  if (testiViewport && testiTrack && testiCards.length) {
+    let testiIndex = 0;
+
+    function visibleCount() {
+      return window.innerWidth <= 900 ? 1 : 3;
+    }
+
+    function maxIndex() {
+      return Math.max(0, testiCards.length - visibleCount());
+    }
+
+    function buildDots() {
+      if (!testiDotsWrap) return;
+      testiDotsWrap.innerHTML = "";
+      for (let i = 0; i <= maxIndex(); i++) {
+        const dot = document.createElement("span");
+        if (i === testiIndex) dot.classList.add("is-active");
+        dot.addEventListener("click", () => goTo(i));
+        testiDotsWrap.appendChild(dot);
+      }
+    }
+
+    function render() {
+      const cardWidth = testiCards[0].getBoundingClientRect().width;
+      const gap = 24;
+      const offset = testiIndex * (cardWidth + gap);
+      testiTrack.style.transform = `translateX(-${offset}px)`;
+      if (testiDotsWrap) {
+        Array.from(testiDotsWrap.children).forEach((d, idx) =>
+          d.classList.toggle("is-active", idx === testiIndex)
+        );
+      }
+    }
+
+    function goTo(i) {
+      testiIndex = Math.max(0, Math.min(i, maxIndex()));
+      render();
+    }
+
+    document.querySelectorAll(".testi-arrow").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const dir = btn.classList.contains("testi-arrow--next") ? 1 : -1;
+        goTo(testiIndex + dir);
+      });
+    });
+
+    let resizeTimer;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        testiIndex = Math.min(testiIndex, maxIndex());
+        buildDots();
+        render();
+      }, 150);
+    });
+
+    buildDots();
+    render();
+  }
+
+  /* Portfolio filter — animate cards out, swap display, animate matching cards in */
   const filterBtns = document.querySelectorAll(".filter-btn");
   const portfolioCards = document.querySelectorAll(".portfolio-card");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   filterBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
       filterBtns.forEach((b) => b.classList.remove("is-active"));
       btn.classList.add("is-active");
       const filter = btn.dataset.filter;
+
       portfolioCards.forEach((card) => {
         const match = filter === "all" || card.dataset.category === filter;
-        card.dataset.hidden = match ? "false" : "true";
+        const wasHidden = card.dataset.hidden === "true";
+
+        if (match) {
+          if (wasHidden) {
+            card.dataset.hidden = "false";
+            if (reducedMotion) {
+              card.classList.remove("is-hiding");
+            } else {
+              card.classList.add("is-hiding");
+              requestAnimationFrame(() => requestAnimationFrame(() => card.classList.remove("is-hiding")));
+            }
+          }
+        } else if (!wasHidden) {
+          if (reducedMotion) {
+            card.dataset.hidden = "true";
+          } else {
+            card.classList.add("is-hiding");
+            setTimeout(() => {
+              card.dataset.hidden = "true";
+            }, 280);
+          }
+        }
       });
     });
   });
@@ -155,17 +223,33 @@
     contactForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const status = contactForm.querySelector(".form-status");
+      const submitBtn = contactForm.querySelector('button[type="submit"]');
       const required = contactForm.querySelectorAll("[required]");
       let valid = true;
       required.forEach((field) => {
         if (!field.value.trim()) valid = false;
       });
-      if (!status) return;
-      status.className = "form-status " + (valid ? "is-success" : "is-error");
-      status.textContent = valid
-        ? "Thank you! Your inquiry has been submitted. We'll get back to you within 24 hours to discuss your project."
-        : "Please fill in all required fields before submitting.";
-      if (valid) contactForm.reset();
+
+      const originalLabel = submitBtn ? submitBtn.innerHTML : "";
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = 'Sending <i class="ri-loader-4-line spin"></i>';
+      }
+
+      setTimeout(() => {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalLabel;
+        }
+        if (!status) return;
+        status.classList.remove("is-visible");
+        status.className = "form-status " + (valid ? "is-success" : "is-error");
+        status.textContent = valid
+          ? "Thank you! Your inquiry has been submitted. We'll get back to you within 24 hours to discuss your project."
+          : "Please fill in all required fields before submitting.";
+        requestAnimationFrame(() => requestAnimationFrame(() => status.classList.add("is-visible")));
+        if (valid) contactForm.reset();
+      }, 550);
     });
   }
 
