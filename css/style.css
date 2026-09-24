@@ -26,6 +26,8 @@
   --radius-lg: 24px;
   --radius-md: 16px;
 
+  --purple: #8e44ad;
+
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-collect: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-collect-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -89,6 +91,7 @@
   .nav-toggle,
   .hero__title-line,
   .hero__title .italic-accent,
+  .hero__subtext,
   .hero__divider,
   .typewriter,
   .mosaic-wrap {
@@ -366,6 +369,41 @@ button {
   margin: 0 1px;
 }
 
+.logo__img--light {
+  display: none;
+}
+
+/* Nav starts over a dark hero — swap to the yellow logo and light text
+   until the bar scrolls to its white/frosted state */
+.site-nav--dark-hero .logo__img--dark {
+  display: none;
+}
+.site-nav--dark-hero .logo__img--light {
+  display: inline-block;
+}
+.site-nav--dark-hero.is-scrolled .logo__img--dark {
+  display: inline-block;
+}
+.site-nav--dark-hero.is-scrolled .logo__img--light {
+  display: none;
+}
+
+.site-nav--dark-hero .nav-toggle {
+  color: var(--cream);
+}
+.site-nav--dark-hero.is-scrolled .nav-toggle {
+  color: var(--wine);
+}
+
+@media (min-width: 901px) {
+  .site-nav--dark-hero .nav-links a {
+    color: var(--cream);
+  }
+  .site-nav--dark-hero.is-scrolled .nav-links a {
+    color: var(--wine);
+  }
+}
+
 .nav-links {
   display: flex;
   align-items: center;
@@ -405,12 +443,24 @@ button {
 .nav-links li {
   animation: introDrop 0.7s var(--ease-collect) both;
 }
-.nav-links li:nth-child(1) { animation-delay: 0.16s; }
-.nav-links li:nth-child(2) { animation-delay: 0.22s; }
-.nav-links li:nth-child(3) { animation-delay: 0.28s; }
-.nav-links li:nth-child(4) { animation-delay: 0.34s; }
-.nav-links li:nth-child(5) { animation-delay: 0.4s; }
-.nav-links li:nth-child(6) { animation-delay: 0.46s; }
+.nav-links li:nth-child(1) {
+  animation-delay: 0.16s;
+}
+.nav-links li:nth-child(2) {
+  animation-delay: 0.22s;
+}
+.nav-links li:nth-child(3) {
+  animation-delay: 0.28s;
+}
+.nav-links li:nth-child(4) {
+  animation-delay: 0.34s;
+}
+.nav-links li:nth-child(5) {
+  animation-delay: 0.4s;
+}
+.nav-links li:nth-child(6) {
+  animation-delay: 0.46s;
+}
 
 .nav-cta {
   display: none;
@@ -579,7 +629,7 @@ button {
   overflow: hidden;
 }
 
-/* full-bleed cinematic hero-top — photo is the texture, type carries the brand */
+/* full-bleed cinematic hero-top — the wordmark itself becomes a subtle repeating texture */
 .hero-top {
   position: relative;
   z-index: 1;
@@ -587,12 +637,29 @@ button {
   display: flex;
   align-items: center;
   text-align: center;
-  background-color: var(--wine);
+  overflow: hidden;
+}
+
+.hero-top::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background-image: url("../img/logo-yellow.png");
+  background-repeat: space;
+  background-size: 200px 24px;
+  transform: rotate(-8deg);
+  opacity: 0.1;
+  pointer-events: none;
+  z-index: 0;
 }
 
 @media (max-width: 640px) {
   .hero-top {
     min-height: 520px;
+  }
+
+  .hero-top::before {
+    background-size: 130px 15.6px;
   }
 }
 
@@ -622,6 +689,8 @@ button {
 }
 
 .hero-top .container {
+  position: relative;
+  z-index: 1;
   max-width: 900px;
   margin: 0 auto;
 }
@@ -630,6 +699,18 @@ button {
   margin: 0 0 20px;
   color: var(--cream);
   font-family: var(--font-display);
+  font-size: clamp(1.94rem, 8vw, 6.69rem);
+}
+
+.hero__subtext {
+  max-width: 620px;
+  margin: 0 auto 20px;
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: var(--text-muted-on-dark);
+  animation: introFadeUp 0.7s var(--ease-collect) both;
+  animation-delay: 0.68s;
 }
 
 .hero__title-line {
@@ -708,7 +789,7 @@ button {
 .typewriter__cursor {
   display: inline-block;
   margin-left: 3px;
-  color: var(--gold);
+  color: var(--purple);
   font-weight: 700;
   font-size: 1.4rem;
   animation: sfCursorBlink 0.9s steps(1) infinite;
@@ -734,7 +815,7 @@ button {
 
   .hero__title {
     font-family: var(--font-display);
-    font-size: clamp(2.1rem, 11vw, 3rem);
+    font-size: clamp(1.29rem, 11vw, 2.19rem);
     line-height: 1.08;
     letter-spacing: -0.01em;
     margin-bottom: 28px;
