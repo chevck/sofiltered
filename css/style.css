@@ -587,22 +587,12 @@ button {
   display: flex;
   align-items: center;
   text-align: center;
-  background-image:
-    linear-gradient(
-      180deg,
-      rgba(54, 0, 25, 0.8) 0%,
-      rgba(54, 0, 25, 0.55) 45%,
-      rgba(54, 0, 25, 0.3) 100%
-    ),
-    url("../img/bg-2-web.jpg");
-  background-size: cover;
-  background-position: center 25%;
+  background-color: var(--wine);
 }
 
 @media (max-width: 640px) {
   .hero-top {
     min-height: 520px;
-    background-position: center 25%;
   }
 }
 
@@ -711,6 +701,8 @@ button {
   font-weight: 700;
   font-size: 1.4rem;
   color: var(--cream);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .typewriter__cursor {
