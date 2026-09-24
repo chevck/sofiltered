@@ -27,12 +27,75 @@
   --radius-md: 16px;
 
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-collect: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-collect-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 *,
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+/* ==========================================================================
+   Page-load intro — everything drifts in and collects into place
+   ========================================================================== */
+
+@keyframes introDrop {
+  from {
+    opacity: 0;
+    transform: translateY(-22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes introFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-90px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes introFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes introLine {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo,
+  .nav-links li,
+  .nav-toggle,
+  .hero__title-line,
+  .hero__title .italic-accent,
+  .hero__divider,
+  .typewriter,
+  .mosaic-wrap {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
 
 html {
@@ -293,6 +356,8 @@ button {
   font-size: 1.3rem;
   letter-spacing: 0.01em;
   color: var(--wine);
+  animation: introDrop 0.7s var(--ease-collect) both;
+  animation-delay: 0.05s;
 }
 
 .logo__mark {
@@ -337,6 +402,16 @@ button {
   font-weight: 600;
 }
 
+.nav-links li {
+  animation: introDrop 0.7s var(--ease-collect) both;
+}
+.nav-links li:nth-child(1) { animation-delay: 0.16s; }
+.nav-links li:nth-child(2) { animation-delay: 0.22s; }
+.nav-links li:nth-child(3) { animation-delay: 0.28s; }
+.nav-links li:nth-child(4) { animation-delay: 0.34s; }
+.nav-links li:nth-child(5) { animation-delay: 0.4s; }
+.nav-links li:nth-child(6) { animation-delay: 0.46s; }
+
 .nav-cta {
   display: none;
 }
@@ -369,6 +444,8 @@ button {
   .nav-toggle {
     display: block;
     z-index: 1100;
+    animation: introDrop 0.7s var(--ease-collect) both;
+    animation-delay: 0.16s;
   }
 }
 
@@ -519,7 +596,7 @@ button {
     ),
     url("../img/bg-2-web.jpg");
   background-size: cover;
-  background-position: center 35%;
+  background-position: center 25%;
 }
 
 @media (max-width: 640px) {
@@ -565,21 +642,41 @@ button {
   font-family: var(--font-display);
 }
 
+.hero__title-line {
+  display: inline-block;
+  animation: introFromLeft 0.9s var(--ease-collect) both;
+  animation-delay: 0.35s;
+}
+
 /* highlighter call-out: a solid gold block, tilted like a marker swipe,
    inverts the usual gold-on-dark relationship into a punchy graphic moment */
 .hero__title .italic-accent {
+  --tilt: -2.5deg;
   display: inline-block;
   color: var(--wine);
   background: var(--gold);
   padding: 0.02em 0.28em 0.06em;
   border-radius: 6px;
-  transform: rotate(-2.5deg);
+  transform: rotate(var(--tilt));
   box-shadow: 0 10px 26px rgba(0, 0, 0, 0.25);
+  animation: introAccentCollect 0.9s var(--ease-collect-pop) both;
+  animation-delay: 0.55s;
+}
+
+@keyframes introAccentCollect {
+  from {
+    opacity: 0;
+    transform: translateX(90px) rotate(calc(var(--tilt) + 12deg)) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) rotate(var(--tilt)) scale(1);
+  }
 }
 
 @media (max-width: 640px) {
   .hero__title .italic-accent {
-    transform: rotate(-2deg);
+    --tilt: -2deg;
   }
 }
 
@@ -587,10 +684,14 @@ button {
   margin: 40px 0 16px;
   border: none;
   border-top: 1px solid rgba(255, 249, 234, 0.25);
+  transform-origin: center;
+  animation: introLine 0.7s var(--ease-collect) both;
+  animation-delay: 0.85s;
 }
 
 .hero__divider--tight {
   margin: 16px 0 0;
+  animation-delay: 1.05s;
 }
 
 /* typewriter */
@@ -600,6 +701,8 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
+  animation: introFadeUp 0.7s var(--ease-collect) both;
+  animation-delay: 0.95s;
 }
 
 .typewriter__text {
@@ -664,6 +767,8 @@ button {
 .mosaic-wrap {
   overflow: hidden;
   padding: 32px 0 0;
+  animation: introFadeUp 0.9s var(--ease-collect) both;
+  animation-delay: 1.15s;
 }
 
 .mosaic-row {
@@ -1146,7 +1251,9 @@ button {
   padding: 36px 28px;
   min-height: 220px;
   box-shadow: 0 10px 30px rgba(54, 0, 25, 0.1);
-  transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
+  transition:
+    transform 0.3s var(--ease),
+    box-shadow 0.3s var(--ease);
 }
 
 .process-card:hover {
@@ -1356,7 +1463,9 @@ button {
   background: rgba(255, 249, 234, 0.3);
   cursor: pointer;
   transform-origin: left center;
-  transition: transform 0.25s var(--ease), background-color 0.25s var(--ease);
+  transition:
+    transform 0.25s var(--ease),
+    background-color 0.25s var(--ease);
 }
 .testi-dots span.is-active {
   transform: scaleX(3.25);
@@ -1761,7 +1870,9 @@ button {
   overflow: hidden;
   background: #fff;
   box-shadow: 0 10px 40px rgba(54, 0, 25, 0.06);
-  transition: transform 0.3s var(--ease), opacity 0.3s var(--ease);
+  transition:
+    transform 0.3s var(--ease),
+    opacity 0.3s var(--ease);
 }
 .portfolio-card:hover {
   transform: translateY(-6px);
@@ -1837,7 +1948,9 @@ button {
   padding: 32px;
   box-shadow: 0 10px 40px rgba(54, 0, 25, 0.05);
   margin-bottom: 24px;
-  transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
+  transition:
+    transform 0.3s var(--ease),
+    box-shadow 0.3s var(--ease);
 }
 
 .contact-info-card:hover {
@@ -1938,7 +2051,9 @@ button {
   display: none;
   opacity: 0;
   transform: translateY(-8px);
-  transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+  transition:
+    opacity 0.3s var(--ease),
+    transform 0.3s var(--ease);
 }
 .form-status.is-success {
   display: block;
@@ -1956,7 +2071,9 @@ button {
 }
 
 @keyframes sfSpin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 .spin {
   display: inline-block;
@@ -1980,26 +2097,26 @@ button {
 }
 
 /* sibling stagger for grids that appear as a list — capped delay */
-.value-grid > [data-reveal]:nth-child(4n+2),
-.team-grid > [data-reveal]:nth-child(4n+2),
-.process-grid > [data-reveal]:nth-child(4n+2) {
+.value-grid > [data-reveal]:nth-child(4n + 2),
+.team-grid > [data-reveal]:nth-child(4n + 2),
+.process-grid > [data-reveal]:nth-child(4n + 2) {
   transition-delay: 0.08s;
 }
-.value-grid > [data-reveal]:nth-child(4n+3),
-.team-grid > [data-reveal]:nth-child(4n+3),
-.process-grid > [data-reveal]:nth-child(4n+3) {
+.value-grid > [data-reveal]:nth-child(4n + 3),
+.team-grid > [data-reveal]:nth-child(4n + 3),
+.process-grid > [data-reveal]:nth-child(4n + 3) {
   transition-delay: 0.16s;
 }
-.value-grid > [data-reveal]:nth-child(4n+4),
-.team-grid > [data-reveal]:nth-child(4n+4),
-.process-grid > [data-reveal]:nth-child(4n+4) {
+.value-grid > [data-reveal]:nth-child(4n + 4),
+.team-grid > [data-reveal]:nth-child(4n + 4),
+.process-grid > [data-reveal]:nth-child(4n + 4) {
   transition-delay: 0.24s;
 }
 
-.portfolio-grid > [data-reveal]:nth-child(3n+2) {
+.portfolio-grid > [data-reveal]:nth-child(3n + 2) {
   transition-delay: 0.08s;
 }
-.portfolio-grid > [data-reveal]:nth-child(3n+3) {
+.portfolio-grid > [data-reveal]:nth-child(3n + 3) {
   transition-delay: 0.16s;
 }
 
