@@ -4,14 +4,28 @@
   /* Nav scroll state */
   const nav = document.querySelector(".site-nav");
   const floatBook = document.querySelector(".float-book");
+  let footerInView = false;
 
   function onScroll() {
     const scrolled = window.scrollY > 40;
     if (nav) nav.classList.toggle("is-scrolled", scrolled);
-    if (floatBook) floatBook.classList.toggle("is-visible", window.scrollY > 400);
+    if (floatBook) floatBook.classList.toggle("is-visible", window.scrollY > 400 && !footerInView);
   }
   document.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
+
+  /* Hide the floating book button once the footer enters view */
+  const siteFooter = document.querySelector(".site-footer");
+  if (siteFooter && floatBook && "IntersectionObserver" in window) {
+    const footerObserver = new IntersectionObserver(
+      (entries) => {
+        footerInView = entries[0].isIntersecting;
+        onScroll();
+      },
+      { rootMargin: "0px" }
+    );
+    footerObserver.observe(siteFooter);
+  }
 
   /* Mosaic rows drift in opposite directions on scroll */
   const mosaicRows = document.querySelectorAll(".mosaic-row");
@@ -253,14 +267,13 @@
     });
   }
 
-  /* Footer newsletter */
-  const footerForm = document.querySelector(".footer-signup form");
-  if (footerForm) {
-    footerForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const input = footerForm.querySelector("input");
-      if (input) input.value = "";
-      footerForm.querySelector("button").innerHTML = '<i class="ri-check-line"></i>';
+  /* Footer menu accordion */
+  const footerMenu = document.querySelector(".footer-menu");
+  const footerMenuToggle = document.querySelector(".footer-menu__toggle");
+  if (footerMenu && footerMenuToggle) {
+    footerMenuToggle.addEventListener("click", () => {
+      const isOpen = footerMenu.classList.toggle("is-open");
+      footerMenuToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
     });
   }
 })();
