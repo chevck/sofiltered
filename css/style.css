@@ -629,7 +629,6 @@ button {
   overflow: hidden;
 }
 
-/* full-bleed cinematic hero-top — the wordmark itself becomes a subtle repeating texture */
 .hero-top {
   position: relative;
   z-index: 1;
@@ -637,29 +636,12 @@ button {
   display: flex;
   align-items: center;
   text-align: center;
-  overflow: hidden;
-}
-
-.hero-top::before {
-  content: "";
-  position: absolute;
-  inset: -20%;
-  background-image: url("../img/logo-yellow.png");
-  background-repeat: space;
-  background-size: 200px 24px;
-  transform: rotate(-8deg);
-  opacity: 0.1;
-  pointer-events: none;
-  z-index: 0;
+  background-color: var(--wine);
 }
 
 @media (max-width: 640px) {
   .hero-top {
     min-height: 520px;
-  }
-
-  .hero-top::before {
-    background-size: 130px 15.6px;
   }
 }
 
@@ -689,8 +671,6 @@ button {
 }
 
 .hero-top .container {
-  position: relative;
-  z-index: 1;
   max-width: 900px;
   margin: 0 auto;
 }
@@ -715,6 +695,7 @@ button {
 
 .hero__title-line {
   display: inline-block;
+  font-size: calc(1em - 30px);
   animation: introFromLeft 0.9s var(--ease-collect) both;
   animation-delay: 0.35s;
 }
@@ -722,14 +703,9 @@ button {
 /* highlighter call-out: a solid gold block, tilted like a marker swipe,
    inverts the usual gold-on-dark relationship into a punchy graphic moment */
 .hero__title .italic-accent {
-  --tilt: -2.5deg;
   display: inline-block;
-  color: var(--wine);
-  background: var(--gold);
-  padding: 0.02em 0.28em 0.06em;
-  border-radius: 6px;
-  transform: rotate(var(--tilt));
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.25);
+  color: var(--gold);
+  font-size: calc(1em + 3px);
   animation: introAccentCollect 0.9s var(--ease-collect-pop) both;
   animation-delay: 0.55s;
 }
@@ -737,17 +713,11 @@ button {
 @keyframes introAccentCollect {
   from {
     opacity: 0;
-    transform: translateX(90px) rotate(calc(var(--tilt) + 12deg)) scale(0.8);
+    transform: translateX(90px) scale(0.8);
   }
   to {
     opacity: 1;
-    transform: translateX(0) rotate(var(--tilt)) scale(1);
-  }
-}
-
-@media (max-width: 640px) {
-  .hero__title .italic-accent {
-    --tilt: -2deg;
+    transform: translateX(0) scale(1);
   }
 }
 
@@ -819,6 +789,11 @@ button {
     line-height: 1.08;
     letter-spacing: -0.01em;
     margin-bottom: 28px;
+  }
+
+  .hero__title-line {
+    /* the flat -30px desktop reduction goes negative at mobile scale — use a proportion instead */
+    font-size: 0.85em;
   }
 
   .hero__divider {
@@ -1107,18 +1082,9 @@ button {
   }
 }
 
-.approach {
-  display: grid;
-  grid-template-columns: 0.8fr 1.2fr;
-  gap: 72px;
-  align-items: start;
-}
-
-@media (max-width: 900px) {
-  .approach {
-    grid-template-columns: 1fr;
-    gap: 40px;
-  }
+.approach-numbers {
+  max-width: 720px;
+  margin: 0 auto;
 }
 
 .approach__image {
@@ -1224,6 +1190,11 @@ button {
   letter-spacing: 0.06em;
 }
 
+.approach-callout {
+  max-width: 720px;
+  margin: 80px auto 0;
+}
+
 .approach-item {
   display: flex;
   gap: 20px;
@@ -1315,6 +1286,66 @@ button {
   .process-grid {
     grid-template-columns: 1fr;
   }
+
+  /* stacking-cards reveal: each card pins near the top, staggered, so the
+     next one slides over it leaving a sliver of the previous one visible */
+  .process-stack-item:not(:last-child) {
+    min-height: 42vh;
+  }
+
+  .process-stack-item .process-card {
+    position: sticky;
+    height: 480px;
+    overflow: hidden;
+    transition:
+      transform 0.3s var(--ease-collect),
+      opacity 0.3s var(--ease-collect);
+  }
+
+  /* smaller cover on mobile so the image + copy both fit inside the fixed card height */
+  .process-card__cover {
+    height: 70px;
+    margin-bottom: 12px;
+  }
+
+  .process-stack-item .process-card__icon {
+    margin-bottom: 14px;
+  }
+
+  .process-stack-item .process-card h3 {
+    font-size: 1.15rem;
+    margin-bottom: 8px;
+  }
+
+  .process-stack-item .process-card p {
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  .process-stack-item:nth-child(1) .process-card {
+    top: 96px;
+    z-index: 1;
+  }
+  .process-stack-item:nth-child(2) .process-card {
+    top: 111px;
+    z-index: 2;
+  }
+  .process-stack-item:nth-child(3) .process-card {
+    top: 126px;
+    z-index: 3;
+  }
+  .process-stack-item:nth-child(4) .process-card {
+    top: 141px;
+    z-index: 4;
+  }
+
+  /* the site-wide scroll-reveal slide fights the sticky snap — keep only its fade here */
+  .process-stack-item .process-card[data-reveal] {
+    transform: none;
+  }
+  .process-stack-item .process-card[data-reveal].is-visible {
+    transform: none;
+  }
 }
 
 .process-card {
@@ -1332,6 +1363,48 @@ button {
 .process-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 16px 40px rgba(54, 0, 25, 0.2);
+}
+
+.process-card__cover {
+  position: relative;
+  margin: -36px -28px 24px;
+  height: 168px;
+  overflow: hidden;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.process-card__cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s var(--ease);
+}
+
+.process-card:hover .process-card__cover img {
+  transform: scale(1.06);
+}
+
+.process-card__cover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+/* fade the cover into whichever background this card actually sits on */
+.process-stack-item:nth-child(odd) .process-card__cover::after {
+  background: linear-gradient(
+    180deg,
+    rgba(54, 0, 25, 0) 55%,
+    rgba(54, 0, 25, 0.5) 100%
+  );
+}
+.process-stack-item:nth-child(even) .process-card__cover::after {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 249, 234, 0) 55%,
+    rgba(255, 249, 234, 0.65) 100%
+  );
 }
 
 .process-card:nth-child(odd) {
@@ -1361,6 +1434,22 @@ button {
 }
 
 .process-card:nth-child(even) .process-card__icon {
+  background: var(--wine-soft);
+  color: var(--wine);
+}
+
+/* cards are wrapped in .process-stack-item for the mobile stacking effect,
+   which makes every .process-card a sole (always "odd") child — re-key the
+   odd/even alternation off the wrapper's position instead */
+.process-stack-item:nth-child(odd) .process-card {
+  background: var(--wine);
+  color: var(--cream);
+}
+.process-stack-item:nth-child(even) .process-card {
+  background: var(--cream);
+  color: var(--wine);
+}
+.process-stack-item:nth-child(even) .process-card .process-card__icon {
   background: var(--wine-soft);
   color: var(--wine);
 }
@@ -1445,6 +1534,8 @@ button {
 }
 
 .testi-card {
+  display: flex;
+  flex-direction: column;
   flex: 0 0 calc((100% - 48px) / 3);
   border-radius: var(--radius-lg);
   padding: 36px 32px;
@@ -1458,7 +1549,7 @@ button {
   }
 }
 
-.testi-card--highlight {
+.testi-card:nth-child(even) {
   background: var(--gold);
   color: var(--wine);
   border-color: transparent;
@@ -1470,7 +1561,7 @@ button {
   letter-spacing: 3px;
   margin-bottom: 18px;
 }
-.testi-card--highlight .stars {
+.testi-card:nth-child(even) .stars {
   color: var(--wine);
 }
 
@@ -1486,11 +1577,12 @@ button {
   display: flex;
   align-items: center;
   gap: 14px;
+  margin-top: auto;
   padding-top: 18px;
   border-top: 1px solid rgba(255, 249, 234, 0.15);
 }
 
-.testi-card--highlight .testi-card__person {
+.testi-card:nth-child(even) .testi-card__person {
   border-color: rgba(54, 0, 25, 0.15);
 }
 
@@ -1502,7 +1594,7 @@ button {
   object-fit: cover;
   flex-shrink: 0;
 }
-.testi-card--highlight .testi-avatar {
+.testi-card:nth-child(even) .testi-avatar {
   background: rgba(54, 0, 25, 0.15);
 }
 
@@ -1511,7 +1603,7 @@ button {
   font-size: 0.92rem;
   color: var(--gold);
 }
-.testi-card--highlight .testi-card__person strong {
+.testi-card:nth-child(even) .testi-card__person strong {
   color: var(--wine);
 }
 
@@ -1519,7 +1611,7 @@ button {
   font-size: 0.8rem;
   color: var(--text-muted-on-dark);
 }
-.testi-card--highlight .testi-card__person span {
+.testi-card:nth-child(even) .testi-card__person span {
   color: rgba(54, 0, 25, 0.65);
 }
 
@@ -1632,16 +1724,8 @@ button {
 }
 
 .footer-cols {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 32px;
   padding-top: 40px;
-}
-
-@media (max-width: 800px) {
-  .footer-cols {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  max-width: 240px;
 }
 
 .footer-col h4 {
@@ -2012,6 +2096,10 @@ button {
 @media (max-width: 900px) {
   .contact-grid {
     grid-template-columns: 1fr;
+  }
+
+  .contact-form-card {
+    order: -1;
   }
 }
 

@@ -54,6 +54,58 @@
     updateMosaic();
   }
 
+  /* Process cards (mobile stack): scale/fade a card slightly as the next one covers it */
+  const processStackCards = document.querySelectorAll(".process-stack-item .process-card");
+  const processStackMql = window.matchMedia("(max-width: 560px)");
+  if (processStackCards.length && !prefersReducedMotion) {
+    let stackTicking = false;
+    const updateStack = () => {
+      if (!processStackMql.matches) {
+        processStackCards.forEach((card) => {
+          card.style.transform = "";
+          card.style.opacity = "";
+        });
+        stackTicking = false;
+        return;
+      }
+      processStackCards.forEach((card, i) => {
+        const next = processStackCards[i + 1];
+        if (!next) {
+          card.style.transform = "";
+          card.style.opacity = "";
+          return;
+        }
+        const cardTop = card.getBoundingClientRect().top;
+        const nextTop = next.getBoundingClientRect().top;
+        const gap = nextTop - cardTop;
+        const coverDistance = 15;
+        const progress = Math.min(1, Math.max(0, 1 - gap / coverDistance));
+        const scale = 1 - progress * 0.04;
+        const opacity = 1 - progress * 0.15;
+        card.style.transform = `scale(${scale})`;
+        card.style.opacity = String(opacity);
+      });
+      stackTicking = false;
+    };
+    document.addEventListener(
+      "scroll",
+      () => {
+        if (!stackTicking) {
+          requestAnimationFrame(updateStack);
+          stackTicking = true;
+        }
+      },
+      { passive: true }
+    );
+    window.addEventListener("resize", () => {
+      if (!stackTicking) {
+        requestAnimationFrame(updateStack);
+        stackTicking = true;
+      }
+    });
+    updateStack();
+  }
+
   /* Typewriter — types, pauses, erases, moves to next label, loops */
   const typewriterEl = document.querySelector(".typewriter__text");
   if (typewriterEl) {
