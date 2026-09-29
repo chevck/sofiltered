@@ -499,6 +499,12 @@ button {
     animation: introDrop 0.7s var(--ease-collect) both;
     animation-delay: 0.16s;
   }
+
+  /* the drawer itself is always cream, so its close icon must stay wine
+     regardless of the dark-hero/scrolled state that colors the rest of the bar */
+  .site-nav .nav-links.is-open ~ .nav-toggle {
+    color: var(--wine);
+  }
 }
 
 /* Floating "Book Now" pill */

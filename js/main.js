@@ -27,31 +27,24 @@
     footerObserver.observe(siteFooter);
   }
 
-  /* Mosaic rows drift in opposite directions on scroll */
+  /* Mosaic rows: a slow perpetual drift keeps them alive even at rest,
+     with scroll position adding extra parallax offset on top */
   const mosaicRows = document.querySelectorAll(".mosaic-row");
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (mosaicRows.length && !prefersReducedMotion) {
-    let mosaicTicking = false;
-    const updateMosaic = () => {
+    const mosaicDriftAmplitude = 40;
+    const mosaicDriftPeriod = 6000 / 1.05;
+    const animateMosaic = (timestamp) => {
       const y = window.scrollY;
+      const drift = Math.sin(timestamp / mosaicDriftPeriod) * mosaicDriftAmplitude;
       mosaicRows.forEach((row, i) => {
         const direction = i % 2 === 0 ? 1 : -1;
-        const offset = Math.max(-220, Math.min(220, y * 0.12 * direction));
-        row.style.transform = `translateX(${offset}px)`;
+        const scrollOffset = Math.max(-220, Math.min(220, y * 0.12 * direction));
+        row.style.transform = `translateX(${scrollOffset + drift * direction}px)`;
       });
-      mosaicTicking = false;
+      requestAnimationFrame(animateMosaic);
     };
-    document.addEventListener(
-      "scroll",
-      () => {
-        if (!mosaicTicking) {
-          requestAnimationFrame(updateMosaic);
-          mosaicTicking = true;
-        }
-      },
-      { passive: true }
-    );
-    updateMosaic();
+    requestAnimationFrame(animateMosaic);
   }
 
   /* Process cards (mobile): all four start visible, cascaded one below the
