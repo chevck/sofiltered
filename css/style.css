@@ -821,6 +821,7 @@ button {
 /* brand mosaic strip — intentionally overflows the viewport edge,
    each row drifts opposite directions as the page scrolls */
 .mosaic-wrap {
+  background: var(--cream);
   overflow: hidden;
   padding: 32px 0 0;
   animation: introFadeUp 0.9s var(--ease-collect) both;
