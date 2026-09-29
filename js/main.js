@@ -54,56 +54,77 @@
     updateMosaic();
   }
 
-  /* Process cards (mobile stack): scale/fade a card slightly as the next one covers it */
-  const processStackCards = document.querySelectorAll(".process-stack-item .process-card");
-  const processStackMql = window.matchMedia("(max-width: 560px)");
-  if (processStackCards.length && !prefersReducedMotion) {
-    let stackTicking = false;
-    const updateStack = () => {
-      if (!processStackMql.matches) {
-        processStackCards.forEach((card) => {
-          card.style.transform = "";
-          card.style.opacity = "";
+  /* Process cards (mobile): all four start visible, cascaded one below the
+     next. As you scroll through the tall .process-grid track, each card in
+     turn scrolls up and hangs directly on the one before it — continuously
+     scrubbed by scroll position, one card closing its gap at a time, never
+     fading in from nothing. The pin holds the whole thing near the top of
+     the viewport until the sequence finishes, then releases into the next
+     section. Scrolling back up reverses the same motion. */
+  const processPileTrack = document.querySelector(".process-grid");
+  const processPileItems = document.querySelectorAll(".process-stack-item");
+  const processPileMql = window.matchMedia("(max-width: 560px)");
+  if (processPileTrack && processPileItems.length) {
+    const pileCount = processPileItems.length;
+    const pileCardHeight = 480; // must match .process-stack-item .process-card height in css/style.css
+    const pileGap = 24;
+    const pileStartOffset = [0, 1, 2, 3].map((i) => i * (pileCardHeight + pileGap));
+    const pileEndOffset = [0, 65, 130, 195];
+    const pileHoldFraction = 0.95; // just a short buffer after the last card settles, then release
+    const pileWindow = 0.45; // each card's own closing motion spans 45% of the track
+    const moverCount = pileCount - 1;
+    const pileStagger = moverCount > 1 ? (pileHoldFraction - pileWindow) / (moverCount - 1) : 0;
+
+    let pileTicking = false;
+    const updatePile = () => {
+      if (!processPileMql.matches) {
+        processPileItems.forEach((item) => {
+          item.style.transform = "";
         });
-        stackTicking = false;
+        pileTicking = false;
         return;
       }
-      processStackCards.forEach((card, i) => {
-        const next = processStackCards[i + 1];
-        if (!next) {
-          card.style.transform = "";
-          card.style.opacity = "";
+      if (prefersReducedMotion) {
+        processPileItems.forEach((item, i) => {
+          item.style.transform = `translateY(${pileEndOffset[i]}px)`;
+        });
+        pileTicking = false;
+        return;
+      }
+      const trackRect = processPileTrack.getBoundingClientRect();
+      const scrollableHeight = processPileTrack.offsetHeight - window.innerHeight;
+      const scrolled = Math.min(Math.max(-trackRect.top, 0), Math.max(scrollableHeight, 0));
+      const progress = scrollableHeight > 0 ? scrolled / scrollableHeight : 0;
+      processPileItems.forEach((item, i) => {
+        if (i === 0) {
+          item.style.transform = "translateY(0px)";
           return;
         }
-        const cardTop = card.getBoundingClientRect().top;
-        const nextTop = next.getBoundingClientRect().top;
-        const gap = nextTop - cardTop;
-        const coverDistance = 15;
-        const progress = Math.min(1, Math.max(0, 1 - gap / coverDistance));
-        const scale = 1 - progress * 0.04;
-        const opacity = 1 - progress * 0.15;
-        card.style.transform = `scale(${scale})`;
-        card.style.opacity = String(opacity);
+        const sliceStart = (i - 1) * pileStagger;
+        const sliceEnd = sliceStart + pileWindow;
+        const local = Math.min(1, Math.max(0, (progress - sliceStart) / (sliceEnd - sliceStart)));
+        const offset = pileStartOffset[i] + (pileEndOffset[i] - pileStartOffset[i]) * local;
+        item.style.transform = `translateY(${offset}px)`;
       });
-      stackTicking = false;
+      pileTicking = false;
     };
     document.addEventListener(
       "scroll",
       () => {
-        if (!stackTicking) {
-          requestAnimationFrame(updateStack);
-          stackTicking = true;
+        if (!pileTicking) {
+          requestAnimationFrame(updatePile);
+          pileTicking = true;
         }
       },
       { passive: true }
     );
     window.addEventListener("resize", () => {
-      if (!stackTicking) {
-        requestAnimationFrame(updateStack);
-        stackTicking = true;
+      if (!pileTicking) {
+        requestAnimationFrame(updatePile);
+        pileTicking = true;
       }
     });
-    updateStack();
+    updatePile();
   }
 
   /* Typewriter — types, pauses, erases, moves to next label, loops */

@@ -640,7 +640,7 @@ button {
 .hero-top {
   position: relative;
   z-index: 1;
-  min-height: 640px;
+  min-height: 480px;
   display: flex;
   align-items: center;
   text-align: center;
@@ -649,7 +649,7 @@ button {
 
 @media (max-width: 640px) {
   .hero-top {
-    min-height: 520px;
+    min-height: 400px;
   }
 }
 
@@ -1261,6 +1261,13 @@ button {
   flex-wrap: wrap;
 }
 
+/* at desktop/tablet this wrapper doesn't exist for layout purposes, so the
+   four cards are direct grid children and sit side by side; the mobile
+   media query below turns it back into a real, positioned pin container */
+.process-pile {
+  display: contents;
+}
+
 .process-grid {
   position: relative;
   display: grid;
@@ -1293,22 +1300,49 @@ button {
 }
 @media (max-width: 560px) {
   .process-grid {
-    grid-template-columns: 1fr;
+    display: block;
+    /* one tall scroll track; JS maps how far you've scrolled through it to
+       how many cards have joined the pile */
+    height: 320vh;
   }
 
-  /* stacking-cards reveal: each card pins near the top, staggered, so the
-     next one slides over it leaving a sliver of the previous one visible */
-  .process-stack-item:not(:last-child) {
-    min-height: 42vh;
+  /* the single pin: holds near the top of the viewport for the entire
+     track above, so none of the cards it contains ever scrolls away on
+     their own — only once you've scrolled past the whole track does this
+     (and the fully-built pile inside it) release into the next section */
+  .process-pile {
+    display: block;
+    position: sticky;
+    top: 96px;
+    height: 480px;
+  }
+
+  /* all four cards are visible from the start, cascaded one below the next
+     (JS sets their initial translateY inline). As you scroll, JS closes the
+     gaps continuously, one card at a time, until each has hung directly on
+     the one before it — a scroll-scrubbed transform, not a fade-in, and
+     nothing ever disappears or pops in out of nowhere. */
+  .process-stack-item {
+    position: absolute;
+    inset: 0;
+  }
+
+  .process-stack-item:nth-child(1) {
+    z-index: 1;
+  }
+  .process-stack-item:nth-child(2) {
+    z-index: 2;
+  }
+  .process-stack-item:nth-child(3) {
+    z-index: 3;
+  }
+  .process-stack-item:nth-child(4) {
+    z-index: 4;
   }
 
   .process-stack-item .process-card {
-    position: sticky;
     height: 480px;
     overflow: hidden;
-    transition:
-      transform 0.3s var(--ease-collect),
-      opacity 0.3s var(--ease-collect);
   }
 
   /* smaller cover on mobile so the image + copy both fit inside the fixed card height */
@@ -1331,28 +1365,9 @@ button {
     line-height: 1.5;
   }
 
-  .process-stack-item:nth-child(1) .process-card {
-    top: 96px;
-    z-index: 1;
-  }
-  .process-stack-item:nth-child(2) .process-card {
-    top: 111px;
-    z-index: 2;
-  }
-  .process-stack-item:nth-child(3) .process-card {
-    top: 126px;
-    z-index: 3;
-  }
-  .process-stack-item:nth-child(4) .process-card {
-    top: 141px;
-    z-index: 4;
-  }
-
-  /* the site-wide scroll-reveal slide fights the sticky snap — keep only its fade here */
+  /* the pile's own opacity/transform reveal replaces the site-wide scroll-reveal here */
   .process-stack-item .process-card[data-reveal] {
-    transform: none;
-  }
-  .process-stack-item .process-card[data-reveal].is-visible {
+    opacity: 1;
     transform: none;
   }
 }
