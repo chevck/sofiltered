@@ -629,7 +629,7 @@ button {
 
 .hero {
   padding-top: 118px;
-  min-height: 100vh;
+  /* min-height: 100vh; */
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -1628,8 +1628,23 @@ button {
   object-fit: cover;
   flex-shrink: 0;
 }
-.testi-card:nth-child(even) .testi-avatar {
-  background: rgba(54, 0, 25, 0.15);
+
+/* a background-image zoom keeps the 44px circle itself fixed — background-size
+   controls how zoomed the logo looks inside it, independent of the container.
+   Each avatar sets its own background-image inline; this just shares the sizing. */
+.testi-avatar--logo {
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+  background-color: #fff;
+  padding: 4px;
+}
+
+/* logo avatars always need a solid white backdrop to read clearly, even on
+   the gold-themed even cards */
+.testi-card:nth-child(even) .testi-avatar--logo {
+  background-color: #fff;
 }
 
 .testi-card__person strong {
