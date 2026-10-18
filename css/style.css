@@ -1130,34 +1130,20 @@ button {
   gap: 40px;
   width: max-content;
   padding: 0 32px;
-  animation: sfLogoSlide 22s linear infinite;
+  animation: sfLogoSlide 66s linear infinite;
 }
 
-.logo-slider__track span {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 1.1rem;
-  color: rgba(255, 249, 234, 0.55);
-  white-space: nowrap;
-}
-
-.logo-slider__track span.alt {
-  font-family: var(--font-body);
-  font-style: normal;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-size: 0.78rem;
-  color: rgba(255, 249, 234, 0.7);
-}
-
-.logo-slider__dot {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--gold);
-  display: inline-block;
+.logo-slider__logo {
+  height: 56px;
+  width: 130px;
+  object-fit: contain;
   flex-shrink: 0;
+}
+
+/* this mark sits small within its own canvas compared to the other logos —
+   scale it up so it reads at the same visual weight in the strip */
+.logo-slider__logo[src*="wellchildhub"] {
+  transform: scale(1.4);
 }
 
 @keyframes sfLogoSlide {
@@ -1627,24 +1613,6 @@ button {
   background: rgba(255, 249, 234, 0.15);
   object-fit: cover;
   flex-shrink: 0;
-}
-
-/* a background-image zoom keeps the 44px circle itself fixed — background-size
-   controls how zoomed the logo looks inside it, independent of the container.
-   Each avatar sets its own background-image inline; this just shares the sizing. */
-.testi-avatar--logo {
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-origin: content-box;
-  background-color: #fff;
-  padding: 4px;
-}
-
-/* logo avatars always need a solid white backdrop to read clearly, even on
-   the gold-themed even cards */
-.testi-card:nth-child(even) .testi-avatar--logo {
-  background-color: #fff;
 }
 
 .testi-card__person strong {
