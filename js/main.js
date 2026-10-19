@@ -59,7 +59,7 @@
   const processPileMql = window.matchMedia("(max-width: 560px)");
   if (processPileTrack && processPileItems.length) {
     const pileCount = processPileItems.length;
-    const pileCardHeight = 480; // must match .process-stack-item .process-card height in css/style.css
+    const pileCardHeight = 390; // must match .process-stack-item .process-card height in css/style.css
     const pileGap = 24;
     const pileStartOffset = [0, 1, 2, 3].map((i) => i * (pileCardHeight + pileGap));
     const pileEndOffset = [0, 65, 130, 195];
