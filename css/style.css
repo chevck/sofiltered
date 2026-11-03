@@ -90,7 +90,7 @@
   .nav-links li,
   .nav-toggle,
   .hero__title-line,
-  .hero__title .italic-accent,
+  .hero__title-line2,
   .hero__subtext,
   .hero__divider,
   .typewriter,
@@ -691,12 +691,15 @@ button {
 }
 
 .hero__subtext {
-  max-width: 620px;
+  /* ch scales with font-size, and the fluid size shrinks on narrow screens —
+     together they keep this at two lines max, at any screen width */
+  max-width: min(44ch, 88vw);
   margin: 0 auto 20px;
   font-family: var(--font-body);
-  font-size: 1.05rem;
+  font-size: clamp(0.82rem, 2.4vw, 1.05rem);
   line-height: 1.65;
   color: var(--text-muted-on-dark);
+  text-wrap: balance;
   animation: introFadeUp 0.7s var(--ease-collect) both;
   animation-delay: 0.68s;
 }
@@ -708,12 +711,18 @@ button {
   animation-delay: 0.35s;
 }
 
-/* highlighter call-out: a solid gold block, tilted like a marker swipe,
-   inverts the usual gold-on-dark relationship into a punchy graphic moment */
+/* "backed by" stays plain; only "strategy" gets the gold italic treatment */
 .hero__title .italic-accent {
   display: inline-block;
-  color: var(--gold);
-  font-size: calc(1em + 3px);
+}
+
+/* the whole line is sized and animated together, off the viewport rather
+   than the parent heading, and capped low enough that "backed by strategy"
+   always fits on one line, at any screen width */
+.hero__title-line2 {
+  display: inline-block;
+  font-size: clamp(1.3rem, 7vw, 4rem);
+  white-space: nowrap;
   animation: introAccentCollect 0.9s var(--ease-collect-pop) both;
   animation-delay: 0.55s;
 }
@@ -1130,7 +1139,7 @@ button {
   gap: 40px;
   width: max-content;
   padding: 0 32px;
-  animation: sfLogoSlide 66s linear infinite;
+  animation: sfLogoSlide 79s linear infinite;
 }
 
 .logo-slider__logo {
@@ -1144,6 +1153,17 @@ button {
    scale it up so it reads at the same visual weight in the strip */
 .logo-slider__logo[src*="wellchildhub"] {
   transform: scale(1.4);
+}
+
+/* +10px */
+.logo-slider__logo[src*="/art-white"],
+.logo-slider__logo[src*="/zerafa-white"] {
+  transform: scale(2.2);
+}
+
+/* +3px */
+.logo-slider__logo[src*="victorian-white"] {
+  transform: scale(1.8);
 }
 
 @keyframes sfLogoSlide {
